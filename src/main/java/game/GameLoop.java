@@ -28,7 +28,7 @@ public class GameLoop {
     r = new Raylib();
     player = new Player();
     random = new Random();
-    enemies = spawnEnemies(1);
+    enemies = spawnEnemies(5);
     projectiles = new ArrayList<>();
     tiempo = new Timer(180);
   }
@@ -57,6 +57,7 @@ public class GameLoop {
     } else if (r.core.IsMouseButtonPressed(0)) {
       int mouseX = r.core.GetMouseX();
       int mouseY = r.core.GetMouseY();
+
       projectiles.add(player.shoot(mouseX, mouseY));
     }
 
