@@ -78,8 +78,9 @@ public class GameLoop {
     r.core.BeginDrawing();
     r.core.ClearBackground(Color.SKYBLUE);
 
-    new Sky().generateSky(r);
-    new Grass().generateGrass(r);
+    new Sky().generate(r);
+    new Grass().generate(r);
+
     player.draw(r);
 
     for (Enemy enemy : enemies) {
