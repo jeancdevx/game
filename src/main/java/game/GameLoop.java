@@ -15,17 +15,24 @@ import java.util.Random;
 
 public class GameLoop {
   private Raylib r;
+  private Random random;
+  
   private Player player;
   private List<Enemy> enemies;
-  private List<Projectile> projectiles;
-  private Random random;
 
+  private List<Projectile> projectiles;
+  
+  private Timer tiempo;
+  private int puntaje;
+  
   public GameLoop() {
     r = new Raylib();
     player = new Player();
-    random = new Random(); // Initialize random here
+    random = new Random();
     enemies = spawnEnemies(player.getX(), 5);
     projectiles = new ArrayList<>();
+    tiempo = new Timer(180);
+    puntaje = 0;
   }
 
   public void run() {
@@ -34,10 +41,12 @@ public class GameLoop {
     while (!r.core.WindowShouldClose()) {
       update();
       draw();
+      tiempo.update();
     }
   }
 
   private void update() {
+     // Player movement
     if (r.core.IsKeyPressed(Keyboard.KEY_D)) {
       player.move(0, Config.WIDTH, Config.HEIGHT);
     } else if (r.core.IsKeyPressed(Keyboard.KEY_A)) {
@@ -52,23 +61,36 @@ public class GameLoop {
       projectiles.add(player.shoot(mouseX, mouseY));
     }
 
+    // Projectile movement
     for (Projectile projectile : projectiles) {
       projectile.move();
     }
 
+    // Enemy movement and collision
     for (Enemy enemy : enemies) {
-      enemy.move(random.nextInt(0, 200), Config.WIDTH, Config.HEIGHT);
+      // enemy movement randomization
+      enemy.move(random.nextInt(0, 300), Config.WIDTH, Config.HEIGHT);
+
+      // enemy collision with projectiles
       for (Projectile projectile : projectiles) {
         if (projectile.collidesWith(enemy)) {
           enemy.damage();
           projectile.setActive(false);
+          //puntaje de los enemigos al ser matados
+        if(enemy.getHealth()<= 0){
+           puntaje += 75;
+       }
+          
         }
       }
     }
 
+    // Remove dead entities
     enemies.removeIf(enemy -> enemy.getHealth() <= 0);
+    // Remove inactive projectiles
     projectiles.removeIf(projectile -> !projectile.isActive());
 
+    // Check if all enemies are dead
     if (enemies.isEmpty()) {
       enemies = spawnEnemies(player.getX(), 5);
     }
@@ -90,16 +112,21 @@ public class GameLoop {
     for (Projectile projectile : projectiles) {
       projectile.draw(r);
     }
-
+    r.text.DrawText("Tiempo restante: " + tiempo.getTime() + " seg", 1175, 15, 20, Color.WHITE);
+    // puntaje en pantalla
+    r.text.DrawText("Puntaje: " + puntaje, 10, 125, 22, Color.GOLD);
     r.core.EndDrawing();
   }
 
   private List<Enemy> spawnEnemies(int playerX, int numEnemies) {
     List<Enemy> enemies = new ArrayList<>();
+
     for (int i = 0; i < numEnemies; i++) {
       int randomY = (random.nextInt(Config.HEIGHT / Config.ENTITY_SIZE) * Config.ENTITY_SIZE);
+
       enemies.add(new Enemy(playerX, randomY));
     }
+
     return enemies;
   }
 }

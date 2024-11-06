@@ -33,6 +33,7 @@ public class Player extends BaseEntity implements Movable {
 
   @Override
   public void draw(Raylib r) {
+    r.shapes.DrawRectangle(10, 85, Config.HEALTH_WIDTH, Config.HEALTH_HEIGHT, color.GREEN);
     r.text.DrawText("Health: " + health, 10, 10, 20, Color.BLACK);
     r.text.DrawText("Player", x, y - 20, 20, Color.BLACK);
     r.shapes.DrawRectangle(x, y, width, height, color);
