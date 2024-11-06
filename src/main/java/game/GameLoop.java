@@ -16,15 +16,14 @@ import java.util.Random;
 public class GameLoop {
   private Raylib r;
   private Random random;
-  
+
   private Player player;
   private List<Enemy> enemies;
 
   private List<Projectile> projectiles;
-  
+
   private Timer tiempo;
-  private int puntaje;
-  
+
   public GameLoop() {
     r = new Raylib();
     player = new Player();
@@ -32,7 +31,6 @@ public class GameLoop {
     enemies = spawnEnemies(player.getX(), 5);
     projectiles = new ArrayList<>();
     tiempo = new Timer(180);
-    puntaje = 0;
   }
 
   public void run() {
@@ -41,12 +39,13 @@ public class GameLoop {
     while (!r.core.WindowShouldClose()) {
       update();
       draw();
-      tiempo.update();
     }
   }
 
   private void update() {
-     // Player movement
+    tiempo.update();
+
+    // Player movement
     if (r.core.IsKeyPressed(Keyboard.KEY_D)) {
       player.move(0, Config.WIDTH, Config.HEIGHT);
     } else if (r.core.IsKeyPressed(Keyboard.KEY_A)) {
@@ -76,11 +75,11 @@ public class GameLoop {
         if (projectile.collidesWith(enemy)) {
           enemy.damage();
           projectile.setActive(false);
-          //puntaje de los enemigos al ser matados
-        if(enemy.getHealth()<= 0){
-           puntaje += 75;
-       }
-          
+
+          // puntaje de los enemigos al ser matados
+          if (enemy.getHealth() <= 0) {
+            player.increaseScore();
+          }
         }
       }
     }
@@ -112,9 +111,11 @@ public class GameLoop {
     for (Projectile projectile : projectiles) {
       projectile.draw(r);
     }
+
     r.text.DrawText("Tiempo restante: " + tiempo.getTime() + " seg", 1175, 15, 20, Color.WHITE);
+
     // puntaje en pantalla
-    r.text.DrawText("Puntaje: " + puntaje, 10, 125, 22, Color.GOLD);
+    r.text.DrawText("Puntaje: " + player.getScore(), 10, 125, 22, Color.GOLD);
     r.core.EndDrawing();
   }
 
