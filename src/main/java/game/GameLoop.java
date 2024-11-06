@@ -16,23 +16,21 @@ import java.util.Random;
 public class GameLoop {
   private Raylib r;
   private Random random;
-  
+
   private Player player;
   private List<Enemy> enemies;
 
   private List<Projectile> projectiles;
-  
+
   private Timer tiempo;
-  private int puntaje;
-  
+
   public GameLoop() {
     r = new Raylib();
     player = new Player();
     random = new Random();
-    enemies = spawnEnemies(player.getX(), 5);
+    enemies = spawnEnemies(1);
     projectiles = new ArrayList<>();
     tiempo = new Timer(180);
-    puntaje = 0;
   }
 
   public void run() {
@@ -41,48 +39,49 @@ public class GameLoop {
     while (!r.core.WindowShouldClose()) {
       update();
       draw();
-      tiempo.update();
     }
   }
 
   private void update() {
-     // Player movement
+    tiempo.update();
+
+    // Player movement
     if (r.core.IsKeyPressed(Keyboard.KEY_D)) {
-      player.move(0, Config.WIDTH, Config.HEIGHT);
+      player.move(0, Config.WIDTH, Config.HEIGHT, enemies);
     } else if (r.core.IsKeyPressed(Keyboard.KEY_A)) {
-      player.move(1, Config.WIDTH, Config.HEIGHT);
+      player.move(1, Config.WIDTH, Config.HEIGHT, enemies);
     } else if (r.core.IsKeyPressed(Keyboard.KEY_S)) {
-      player.move(2, Config.WIDTH, Config.HEIGHT);
+      player.move(2, Config.WIDTH, Config.HEIGHT, enemies);
     } else if (r.core.IsKeyPressed(Keyboard.KEY_W)) {
-      player.move(3, Config.WIDTH, Config.HEIGHT);
+      player.move(3, Config.WIDTH, Config.HEIGHT, enemies);
     } else if (r.core.IsMouseButtonPressed(0)) {
       int mouseX = r.core.GetMouseX();
       int mouseY = r.core.GetMouseY();
       projectiles.add(player.shoot(mouseX, mouseY));
     }
 
-    // Projectile movement
-    for (Projectile projectile : projectiles) {
-      projectile.move();
-    }
-
     // Enemy movement and collision
     for (Enemy enemy : enemies) {
       // enemy movement randomization
-      enemy.move(random.nextInt(0, 300), Config.WIDTH, Config.HEIGHT);
+      enemy.move(random.nextInt(0, 300), Config.WIDTH, Config.HEIGHT, player);
 
       // enemy collision with projectiles
       for (Projectile projectile : projectiles) {
         if (projectile.collidesWith(enemy)) {
           enemy.damage();
           projectile.setActive(false);
-          //puntaje de los enemigos al ser matados
-        if(enemy.getHealth()<= 0){
-           puntaje += 75;
-       }
-          
+
+          // puntaje de los enemigos al ser matados
+          if (enemy.getHealth() <= 0) {
+            player.increaseScore();
+          }
         }
       }
+    }
+
+    // Projectile movement
+    for (Projectile projectile : projectiles) {
+      projectile.move();
     }
 
     // Remove dead entities
@@ -92,7 +91,7 @@ public class GameLoop {
 
     // Check if all enemies are dead
     if (enemies.isEmpty()) {
-      enemies = spawnEnemies(player.getX(), 5);
+      enemies = spawnEnemies(5);
     }
   }
 
@@ -112,19 +111,22 @@ public class GameLoop {
     for (Projectile projectile : projectiles) {
       projectile.draw(r);
     }
+
     r.text.DrawText("Tiempo restante: " + tiempo.getTime() + " seg", 1175, 15, 20, Color.WHITE);
+
     // puntaje en pantalla
-    r.text.DrawText("Puntaje: " + puntaje, 10, 125, 22, Color.GOLD);
+    r.text.DrawText("Puntaje: " + player.getScore(), 10, 125, 22, Color.GOLD);
     r.core.EndDrawing();
   }
 
-  private List<Enemy> spawnEnemies(int playerX, int numEnemies) {
+  private List<Enemy> spawnEnemies(int numEnemies) {
     List<Enemy> enemies = new ArrayList<>();
 
     for (int i = 0; i < numEnemies; i++) {
+      int randomX = (random.nextInt(Config.WIDTH / Config.ENTITY_SIZE) * Config.ENTITY_SIZE);
       int randomY = (random.nextInt(Config.HEIGHT / Config.ENTITY_SIZE) * Config.ENTITY_SIZE);
 
-      enemies.add(new Enemy(playerX, randomY));
+      enemies.add(new Enemy(randomX, randomY));
     }
 
     return enemies;
