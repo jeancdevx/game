@@ -17,20 +17,20 @@ public class Enemy {
   private int health;
 
   public Enemy(int startX, int startY) {
-    this.x = (startX / Config.TILE_SIZE) * Config.TILE_SIZE;
-    this.y = (startY / Config.TILE_SIZE) * Config.TILE_SIZE;
+    this.x = (startX / Config.ENTITY_SIZE) * Config.ENTITY_SIZE;
+    this.y = (startY / Config.ENTITY_SIZE) * Config.ENTITY_SIZE;
 
     // movement
-    dx = Config.TILE_SIZE;
-    dy = Config.TILE_SIZE;
+    dx = Config.ENTITY_SIZE;
+    dy = Config.ENTITY_SIZE;
 
     // scale
     sx = 1;
     sy = 1;
 
     // sizes
-    width = Config.TILE_SIZE;
-    height = Config.TILE_SIZE;
+    width = Config.ENTITY_SIZE;
+    height = Config.ENTITY_SIZE;
 
     // color
     color = Color.BEIGE;

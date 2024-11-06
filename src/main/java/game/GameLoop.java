@@ -97,7 +97,7 @@ public class GameLoop {
   private List<Enemy> spawnEnemies(int playerX, int numEnemies) {
     List<Enemy> enemies = new ArrayList<>();
     for (int i = 0; i < numEnemies; i++) {
-      int randomY = (random.nextInt(Config.HEIGHT / Config.TILE_SIZE) * Config.TILE_SIZE);
+      int randomY = (random.nextInt(Config.HEIGHT / Config.ENTITY_SIZE) * Config.ENTITY_SIZE);
       enemies.add(new Enemy(playerX, randomY));
     }
     return enemies;

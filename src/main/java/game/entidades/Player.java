@@ -19,12 +19,12 @@ public class Player {
   public Player() {
     this.x = Config.WIDTH / 2;
     this.y = 660;
-    this.dx = Config.TILE_SIZE;
-    this.dy = Config.TILE_SIZE;
+    this.dx = Config.ENTITY_SIZE;
+    this.dy = Config.ENTITY_SIZE;
     this.sx = 1;
     this.sy = 1;
-    this.width = Config.TILE_SIZE;
-    this.height = Config.TILE_SIZE;
+    this.width = Config.ENTITY_SIZE;
+    this.height = Config.ENTITY_SIZE;
     this.color = Color.RED;
     this.health = Config.PLAYER_HEALTH;
   }
