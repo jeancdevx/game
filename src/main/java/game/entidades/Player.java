@@ -1,10 +1,12 @@
 package game.entidades;
 
+import java.util.List;
+
 import com.raylib.java.Raylib;
 import com.raylib.java.core.Color;
 import game.Config;
 
-public class Player extends BaseEntity implements Movable {
+public class Player extends BaseEntity {
   private int score;
 
   public Player() {
@@ -12,25 +14,26 @@ public class Player extends BaseEntity implements Movable {
     score = 0;
   }
 
-  @Override
-  public void move(int direction, int screenWidth, int screenHeight) {
-    switch (direction) {
-      case 0:
-        if (x < screenWidth - width)
-          x = x + dx * sx;
-        break;
-      case 1:
-        if (x > 0)
-          x = x - dx * sx;
-        break;
-      case 2:
-        if (y < screenHeight - height)
-          y = y + dy * sx;
-        break;
-      case 3:
-        if (y > 0)
-          y = y - dy * sy;
-        break;
+  public void move(int direction, int screenWidth, int screenHeight, List<Enemy> enemies) {
+    for (BaseEntity enemy : enemies) {
+      switch (direction) {
+        case 0: // Right
+          if (x < screenWidth - width && !(x + dx == enemy.getX() && y == enemy.getY()))
+            x = x + dx * sx;
+          break;
+        case 1: // Left
+          if (x > 0 && !(x - dx == enemy.getX() && y == enemy.getY()))
+            x = x - dx * sx;
+          break;
+        case 2: // Down
+          if (y < screenHeight - height && !(x == enemy.getX() && y + dy == enemy.getY()))
+            y = y + dy * sx;
+          break;
+        case 3: // Up
+          if (y > 0 && !(x == enemy.getX() && y - dy == enemy.getY()))
+            y = y - dy * sy;
+          break;
+      }
     }
   }
 
