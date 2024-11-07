@@ -64,6 +64,7 @@ public class Player extends BaseEntity {
     r.text.DrawText("Player", x, y - 20, 20, Color.BLACK);
     r.text.DrawText("Score: " + score, 10, 40, 20, Color.BLACK);
     r.text.DrawText("Level: " + level, 10, 70, 20, Color.BLACK);
+    r.text.DrawText("Ammo: " + ammo, 10, 100, 20, Color.BLACK);
     r.shapes.DrawRectangle(x, y, width, height, color);
 
     if (shieldActive) {
