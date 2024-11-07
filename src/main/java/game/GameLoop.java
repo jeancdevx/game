@@ -32,6 +32,8 @@ public class GameLoop {
   private int wave;
   private boolean waveDisplay;
   private Instant waveStartTime;
+  private boolean gameOver;
+  private Instant gameOverStartTime;
 
   public GameLoop() {
     r = new Raylib();
@@ -45,6 +47,7 @@ public class GameLoop {
     wave = 1;
     waveDisplay = true;
     waveStartTime = Instant.now();
+    gameOver = false;
   }
 
   public void run() {
@@ -57,6 +60,20 @@ public class GameLoop {
   }
 
   private void update() {
+    if (gameOver) {
+      if (Duration.between(gameOverStartTime, Instant.now()).getSeconds() >= 3) {
+        resetGame();
+      }
+      return;
+    }
+
+    // Check for player death
+    if (player.getHealth() <= 0 && !gameOver) {
+      gameOver = true;
+      gameOverStartTime = Instant.now();
+      return;
+    }
+
     // Timer update
     tiempo.update();
 
@@ -192,7 +209,26 @@ public class GameLoop {
       r.text.DrawText("Wave " + wave, Config.WIDTH / 2 - 50, Config.HEIGHT / 2, 40, Color.RED);
     }
 
+    if (gameOver) {
+      r.text.DrawText("GAME OVER", Config.WIDTH / 2 - 100, Config.HEIGHT / 2, 40, Color.RED);
+      r.text.DrawText("Final Score: " + player.getScore(), Config.WIDTH / 2 - 100, Config.HEIGHT / 2 + 50, 30,
+          Color.RED);
+    }
+
     r.core.EndDrawing();
+  }
+
+  private void resetGame() {
+    player = new Player();
+    enemies.clear();
+    projectiles.clear();
+    enemyProjectiles.clear();
+    shields.clear();
+    tiempo = new Timer(60);
+    wave = 1;
+    waveDisplay = true;
+    waveStartTime = Instant.now();
+    gameOver = false;
   }
 
   private List<AbstractEnemy> spawnEnemies(int numEnemies) {
