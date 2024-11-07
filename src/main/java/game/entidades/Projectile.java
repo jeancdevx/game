@@ -47,6 +47,10 @@ public class Projectile {
   }
 
   public boolean collidesWith(AbstractEnemy enemy) {
+    if (enemy == null) {
+      return false;
+    }
+
     return active && x < enemy.getX() + enemy.getWidth() && x + width > enemy.getX() &&
         y < enemy.getY() + enemy.getHeight() && y + height > enemy.getY();
   }
