@@ -9,3 +9,5 @@ META-INF/
 *.txt
 .gradle/
 build/
+target/
+*.class
