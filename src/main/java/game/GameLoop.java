@@ -65,6 +65,10 @@ public class GameLoop {
       projectile.move();
     }
 
+    // Projectile reload
+    if (r.core.IsKeyPressed(Keyboard.KEY_R))
+      player.reload();
+
     // Enemy movement and collision
     for (Enemy enemy : enemies) {
       // enemy movement randomization
@@ -79,6 +83,7 @@ public class GameLoop {
           // puntaje de los enemigos al ser matados
           if (enemy.getHealth() <= 0) {
             player.increaseScore();
+            player.increaseLevel();
           }
         }
       }
@@ -116,6 +121,9 @@ public class GameLoop {
 
     // puntaje en pantalla
     r.text.DrawText("Puntaje: " + player.getScore(), 10, 125, 22, Color.GOLD);
+
+    // level en patalla
+    r.text.DrawText("Level: " + player.getLevel(), 10, 150, 22, Color.GREEN);
     r.core.EndDrawing();
   }
 
