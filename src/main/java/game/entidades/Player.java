@@ -155,4 +155,10 @@ public class Player extends BaseEntity {
   public int getLevel() {
     return level;
   }
+
+  public void collectHeart() {
+    if (health < MAX_HEALTH) {
+      health++;
+    }
+  }
 }
