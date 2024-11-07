@@ -49,7 +49,7 @@ public class GameLoop {
     enemyProjectiles = new ArrayList<>();
     shields = new ArrayList<>();
     hearts = new ArrayList<>();
-    tiempo = new Timer(60);
+    tiempo = new Timer(3);
     wave = 1;
     waveDisplay = true;
     waveStartTime = Instant.now();
