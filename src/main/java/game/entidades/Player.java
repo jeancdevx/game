@@ -25,7 +25,7 @@ public class Player extends BaseEntity {
         Config.ENTITY_SIZE,
         Config.ENTITY_SIZE,
         Color.RED,
-        MAX_HEALTH); // Start with max health
+        MAX_HEALTH);
     score = 0;
     level = 0;
     maxAmmo = 20;
@@ -34,22 +34,21 @@ public class Player extends BaseEntity {
     shieldDuration = Duration.ofSeconds(15);
   }
 
-  // Update the move method signature to include boss parameter
   public void move(int direction, int screenWidth, int screenHeight, List<AbstractEnemy> enemies, Boss boss) {
     int newX = x;
     int newY = y;
 
     switch (direction) {
-      case 0: // Right
+      case 0:
         newX = x + dx * sx;
         break;
-      case 1: // Left
+      case 1:
         newX = x - dx * sx;
         break;
-      case 2: // Down
+      case 2:
         newY = y + dy * sx;
         break;
-      case 3: // Up
+      case 3:
         newY = y - dy * sy;
         break;
     }
@@ -60,17 +59,14 @@ public class Player extends BaseEntity {
     }
   }
 
-  // Add new canMove method that handles both enemies and boss
   private boolean canMove(int newX, int newY, int screenWidth, int screenHeight,
       List<AbstractEnemy> enemies, Boss boss) {
-    // Check screen bounds
     if (newX < 0 || newX >= screenWidth || newY < 0 || newY >= screenHeight) {
       return false;
     }
 
-    // Check collision with enemies
     for (AbstractEnemy enemy : enemies) {
-      if (enemy != null && // Add null check
+      if (enemy != null &&
           newX < enemy.getX() + enemy.getWidth() &&
           newX + width > enemy.getX() &&
           newY < enemy.getY() + enemy.getHeight() &&
@@ -79,13 +75,12 @@ public class Player extends BaseEntity {
       }
     }
 
-    // Check collision with boss if it exists
     if (boss != null) {
       if (newX < boss.getX() + boss.getWidth() &&
           newX + width > boss.getX() &&
           newY < boss.getY() + boss.getHeight() &&
           newY + height > boss.getY()) {
-        damage(); // Player takes damage when colliding with boss
+        damage();
         return false;
       }
     }
