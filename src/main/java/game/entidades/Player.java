@@ -1,5 +1,7 @@
 package game.entidades;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 import com.raylib.java.Raylib;
@@ -11,6 +13,9 @@ public class Player extends BaseEntity {
   private int level;
   private int ammo;
   private int maxAmmo;
+  private boolean shieldActive;
+  private Instant shieldStartTime;
+  private Duration shieldDuration;
 
   public Player() {
     super(
@@ -24,6 +29,8 @@ public class Player extends BaseEntity {
     level = 0;
     maxAmmo = 20;
     ammo = maxAmmo;
+    shieldActive = false;
+    shieldDuration = Duration.ofSeconds(15);
   }
 
   public void move(int direction, int screenWidth, int screenHeight, List<Enemy> enemies) {
@@ -66,25 +73,33 @@ public class Player extends BaseEntity {
 
   @Override
   public void draw(Raylib r) {
-    r.shapes.DrawRectangle(
-        10,
-        85,
-        Config.HEALTH_WIDTH,
-        Config.HEALTH_HEIGHT,
-        Color.GREEN);
     r.text.DrawText("Health: " + health, 10, 10, 20, Color.BLACK);
     r.text.DrawText("Player", x, y - 20, 20, Color.BLACK);
     r.shapes.DrawRectangle(x, y, width, height, color);
+
+    if (shieldActive) {
+      r.shapes.DrawRectangle(x, y, width, height, Color.MAGENTA);
+    }
   }
 
-  public void accelerate() {
-    sx++;
-    sy++;
+  public void activateShield() {
+    shieldActive = true;
+    shieldStartTime = Instant.now();
+    health++;
   }
 
-  public void decelerate() {
-    sx--;
-    sy--;
+  public void updateShield() {
+    if (shieldActive && Duration.between(shieldStartTime, Instant.now()).compareTo(shieldDuration) >= 0) {
+      shieldActive = false;
+
+      if (health > 1) {
+        health--;
+      }
+    }
+  }
+
+  public boolean isShieldActive() {
+    return shieldActive;
   }
 
   public void reload() {

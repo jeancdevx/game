@@ -6,6 +6,7 @@ import com.raylib.java.core.input.Keyboard;
 import game.entidades.Enemy;
 import game.entidades.Player;
 import game.entidades.Projectile;
+import game.entidades.Shield;
 import game.textures.Grass;
 import game.textures.Sky;
 
@@ -19,8 +20,8 @@ public class GameLoop {
 
   private Player player;
   private List<Enemy> enemies;
-
   private List<Projectile> projectiles;
+  private List<Shield> shields;
 
   private Timer tiempo;
 
@@ -30,6 +31,7 @@ public class GameLoop {
     random = new Random();
     enemies = spawnEnemies(5);
     projectiles = new ArrayList<>();
+    shields = new ArrayList<>();
     tiempo = new Timer(180);
   }
 
@@ -81,6 +83,11 @@ public class GameLoop {
           if (enemy.getHealth() <= 0) {
             player.increaseScore();
             player.increaseLevel();
+
+            // Randomly drop a shield
+            if (random.nextInt(100) < 20) { // 20% chance to drop a shield
+              shields.add(new Shield(enemy.getX(), enemy.getY()));
+            }
           }
         }
       }
@@ -100,6 +107,20 @@ public class GameLoop {
     if (enemies.isEmpty()) {
       enemies = spawnEnemies(5);
     }
+
+    // Shield pickup
+    for (Shield shield : shields) {
+      if (shield.collidesWith(player)) {
+        player.activateShield();
+        shield.setActive(false);
+      }
+    }
+
+    // Remove inactive shields
+    shields.removeIf(shield -> !shield.isActive());
+
+    // Update player shield status
+    player.updateShield();
   }
 
   private void draw() {
@@ -117,6 +138,10 @@ public class GameLoop {
 
     for (Projectile projectile : projectiles) {
       projectile.draw(r);
+    }
+
+    for (Shield shield : shields) {
+      shield.draw(r);
     }
 
     r.text.DrawText("Tiempo restante: " + tiempo.getTime() + " seg", 1175, 15, 20, Color.WHITE);
