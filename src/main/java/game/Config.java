@@ -7,6 +7,6 @@ public class Config {
   public static final int PLAYER_HEALTH = 5;
   public static final int ENEMY_HEALTH = 3;
   public static final int PROJECTILE_SPEED = 10;
-  public static final int HEALTH_WIDTH =250;
-  public static final int HEALTH_HEIGHT =25;
+  public static final int HEALTH_WIDTH = 250;
+  public static final int HEALTH_HEIGHT = 25;
 }

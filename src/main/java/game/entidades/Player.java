@@ -1,10 +1,13 @@
 package game.entidades;
 
+import java.util.List;
+
 import com.raylib.java.Raylib;
 import com.raylib.java.core.Color;
 import game.Config;
 
-public class Player extends BaseEntity implements Movable {
+public class Player extends BaseEntity {
+  private int score;
 
     private int score;
     private int level;
@@ -24,28 +27,44 @@ public class Player extends BaseEntity implements Movable {
         maxAmmo = 20;
         ammo = maxAmmo;
     }
+  
+  public void move(int direction, int screenWidth, int screenHeight, List<Enemy> enemies) {
+    boolean collision = false;
+    int newX = x;
+    int newY = y;
 
-    @Override
-    public void move(int direction, int screenWidth, int screenHeight) {
-        switch (direction) {
-            case 0:
-                if (x < screenWidth - width)
-                    x = x + dx * sx;
-                break;
-            case 1:
-                if (x > 0)
-                    x = x - dx * sx;
-                break;
-            case 2:
-                if (y < screenHeight - height)
-                    y = y + dy * sx;
-                break;
-            case 3:
-                if (y > 0)
-                    y = y - dy * sy;
-                break;
-        }
+    switch (direction) {
+      case 0: // Right
+        if (x < screenWidth - width)
+          x = x + dx * sx;
+        break;
+      case 1: // Left
+        if (x > 0)
+          x = x - dx * sx;
+        break;
+      case 2: // Down
+        if (y < screenHeight - height)
+          y = y + dy * sx;
+        break;
+      case 3: // Up
+        if (y > 0)
+          y = y - dy * sy;
+        break;
     }
+
+    for (Enemy enemy : enemies) {
+      if ((x == enemy.getX() && y == enemy.getY()) || (x == enemy.getX() && y == enemy.getY())
+          || (x == enemy.getX() && y == enemy.getY()) || (x == enemy.getX() && y == enemy.getY())) {
+        collision = true;
+        break;
+      }
+    }
+
+    if (collision) {
+      x = newX;
+      y = newY;
+    }
+  }
 
     @Override
     public void draw(Raylib r) {

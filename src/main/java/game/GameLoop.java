@@ -28,7 +28,7 @@ public class GameLoop {
     r = new Raylib();
     player = new Player();
     random = new Random();
-    enemies = spawnEnemies(player.getX(), 5);
+    enemies = spawnEnemies(5);
     projectiles = new ArrayList<>();
     tiempo = new Timer(180);
   }
@@ -47,22 +47,18 @@ public class GameLoop {
 
     // Player movement
     if (r.core.IsKeyPressed(Keyboard.KEY_D)) {
-      player.move(0, Config.WIDTH, Config.HEIGHT);
+      player.move(0, Config.WIDTH, Config.HEIGHT, enemies);
     } else if (r.core.IsKeyPressed(Keyboard.KEY_A)) {
-      player.move(1, Config.WIDTH, Config.HEIGHT);
+      player.move(1, Config.WIDTH, Config.HEIGHT, enemies);
     } else if (r.core.IsKeyPressed(Keyboard.KEY_S)) {
-      player.move(2, Config.WIDTH, Config.HEIGHT);
+      player.move(2, Config.WIDTH, Config.HEIGHT, enemies);
     } else if (r.core.IsKeyPressed(Keyboard.KEY_W)) {
-      player.move(3, Config.WIDTH, Config.HEIGHT);
+      player.move(3, Config.WIDTH, Config.HEIGHT, enemies);
     } else if (r.core.IsMouseButtonPressed(0)) {
       int mouseX = r.core.GetMouseX();
       int mouseY = r.core.GetMouseY();
-      projectiles.add(player.shoot(mouseX, mouseY));
-    }
 
-    // Projectile movement
-    for (Projectile projectile : projectiles) {
-      projectile.move();
+      projectiles.add(player.shoot(mouseX, mouseY));
     }
 
     // Projectile reload
@@ -72,7 +68,7 @@ public class GameLoop {
     // Enemy movement and collision
     for (Enemy enemy : enemies) {
       // enemy movement randomization
-      enemy.move(random.nextInt(0, 300), Config.WIDTH, Config.HEIGHT);
+      enemy.move(random.nextInt(0, 300), Config.WIDTH, Config.HEIGHT, player);
 
       // enemy collision with projectiles
       for (Projectile projectile : projectiles) {
@@ -89,6 +85,11 @@ public class GameLoop {
       }
     }
 
+    // Projectile movement
+    for (Projectile projectile : projectiles) {
+      projectile.move();
+    }
+
     // Remove dead entities
     enemies.removeIf(enemy -> enemy.getHealth() <= 0);
     // Remove inactive projectiles
@@ -96,7 +97,7 @@ public class GameLoop {
 
     // Check if all enemies are dead
     if (enemies.isEmpty()) {
-      enemies = spawnEnemies(player.getX(), 5);
+      enemies = spawnEnemies(5);
     }
   }
 
@@ -127,13 +128,14 @@ public class GameLoop {
     r.core.EndDrawing();
   }
 
-  private List<Enemy> spawnEnemies(int playerX, int numEnemies) {
+  private List<Enemy> spawnEnemies(int numEnemies) {
     List<Enemy> enemies = new ArrayList<>();
 
     for (int i = 0; i < numEnemies; i++) {
+      int randomX = (random.nextInt(Config.WIDTH / Config.ENTITY_SIZE) * Config.ENTITY_SIZE);
       int randomY = (random.nextInt(Config.HEIGHT / Config.ENTITY_SIZE) * Config.ENTITY_SIZE);
 
-      enemies.add(new Enemy(playerX, randomY));
+      enemies.add(new Enemy(randomX, randomY));
     }
 
     return enemies;
