@@ -43,6 +43,7 @@ public class GameLoop {
   }
 
   private void update() {
+    // Timer update
     tiempo.update();
 
     // Player movement
@@ -68,7 +69,7 @@ public class GameLoop {
     // Enemy movement and collision
     for (Enemy enemy : enemies) {
       // enemy movement randomization
-      enemy.move(random.nextInt(0, 300), Config.WIDTH, Config.HEIGHT, player);
+      enemy.move(random.nextInt(0, 300), Config.WIDTH, Config.HEIGHT, player, enemies);
 
       // enemy collision with projectiles
       for (Projectile projectile : projectiles) {
