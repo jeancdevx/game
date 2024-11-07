@@ -34,7 +34,8 @@ public class Player extends BaseEntity {
     shieldDuration = Duration.ofSeconds(15);
   }
 
-  public void move(int direction, int screenWidth, int screenHeight, List<AbstractEnemy> enemies) {
+  // Update the move method signature to include boss parameter
+  public void move(int direction, int screenWidth, int screenHeight, List<AbstractEnemy> enemies, Boss boss) {
     int newX = x;
     int newY = y;
 
@@ -53,10 +54,43 @@ public class Player extends BaseEntity {
         break;
     }
 
-    if (canMove(newX, newY, screenWidth, screenHeight, enemies)) {
+    if (canMove(newX, newY, screenWidth, screenHeight, enemies, boss)) {
       x = newX;
       y = newY;
     }
+  }
+
+  // Add new canMove method that handles both enemies and boss
+  private boolean canMove(int newX, int newY, int screenWidth, int screenHeight,
+      List<AbstractEnemy> enemies, Boss boss) {
+    // Check screen bounds
+    if (newX < 0 || newX >= screenWidth || newY < 0 || newY >= screenHeight) {
+      return false;
+    }
+
+    // Check collision with enemies
+    for (AbstractEnemy enemy : enemies) {
+      if (enemy != null && // Add null check
+          newX < enemy.getX() + enemy.getWidth() &&
+          newX + width > enemy.getX() &&
+          newY < enemy.getY() + enemy.getHeight() &&
+          newY + height > enemy.getY()) {
+        return false;
+      }
+    }
+
+    // Check collision with boss if it exists
+    if (boss != null) {
+      if (newX < boss.getX() + boss.getWidth() &&
+          newX + width > boss.getX() &&
+          newY < boss.getY() + boss.getHeight() &&
+          newY + height > boss.getY()) {
+        damage(); // Player takes damage when colliding with boss
+        return false;
+      }
+    }
+
+    return true;
   }
 
   @Override
