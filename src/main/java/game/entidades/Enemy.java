@@ -4,11 +4,14 @@ import com.raylib.java.Raylib;
 import com.raylib.java.core.Color;
 import game.Config;
 import java.util.List;
+import java.util.Random;
 
 public class Enemy extends AbstractEnemy {
+  private Random random;
+
   public Enemy(int startX, int startY) {
-    super((startX / Config.ENTITY_SIZE) * Config.ENTITY_SIZE, (startY / Config.ENTITY_SIZE) * Config.ENTITY_SIZE,
-        Config.ENTITY_SIZE, Config.ENTITY_SIZE, Color.BEIGE, Config.ENEMY_HEALTH);
+    super(startX, startY, Config.ENTITY_SIZE, Config.ENTITY_SIZE, Color.BEIGE, Config.ENEMY_HEALTH);
+    random = new Random();
   }
 
   @Override
@@ -35,6 +38,13 @@ public class Enemy extends AbstractEnemy {
       x = newX;
       y = newY;
     }
+  }
+
+  public EnemyProjectile shoot(Player player, int speed) {
+    if (random.nextInt(50000) < 10) { // 10% chance to shoot
+      return new EnemyProjectile(x + width / 2, y + height / 2, player.getX(), player.getY(), speed);
+    }
+    return null;
   }
 
   @Override
