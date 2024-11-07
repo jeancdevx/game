@@ -44,7 +44,7 @@ public class Projectile {
     }
   }
 
-  public boolean collidesWith(Enemy enemy) {
+  public boolean collidesWith(AbstractEnemy enemy) {
     return active && x < enemy.getX() + enemy.getWidth() && x + width > enemy.getX() &&
         y < enemy.getY() + enemy.getHeight() && y + height > enemy.getY();
   }

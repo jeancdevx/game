@@ -33,39 +33,26 @@ public class Player extends BaseEntity {
     shieldDuration = Duration.ofSeconds(15);
   }
 
-  public void move(int direction, int screenWidth, int screenHeight, List<Enemy> enemies) {
-    boolean collision = false;
+  public void move(int direction, int screenWidth, int screenHeight, List<AbstractEnemy> enemies) {
     int newX = x;
     int newY = y;
 
     switch (direction) {
       case 0: // Right
-        if (x < screenWidth - width)
-          x = x + dx * sx;
+        newX = x + dx * sx;
         break;
       case 1: // Left
-        if (x > 0)
-          x = x - dx * sx;
+        newX = x - dx * sx;
         break;
       case 2: // Down
-        if (y < screenHeight - height)
-          y = y + dy * sx;
+        newY = y + dy * sx;
         break;
       case 3: // Up
-        if (y > 0)
-          y = y - dy * sy;
+        newY = y - dy * sy;
         break;
     }
 
-    for (Enemy enemy : enemies) {
-      if ((x == enemy.getX() && y == enemy.getY()) || (x == enemy.getX() && y == enemy.getY())
-          || (x == enemy.getX() && y == enemy.getY()) || (x == enemy.getX() && y == enemy.getY())) {
-        collision = true;
-        break;
-      }
-    }
-
-    if (collision) {
+    if (canMove(newX, newY, screenWidth, screenHeight, enemies)) {
       x = newX;
       y = newY;
     }
@@ -75,6 +62,8 @@ public class Player extends BaseEntity {
   public void draw(Raylib r) {
     r.text.DrawText("Health: " + health, 10, 10, 20, Color.BLACK);
     r.text.DrawText("Player", x, y - 20, 20, Color.BLACK);
+    r.text.DrawText("Score: " + score, 10, 40, 20, Color.BLACK);
+    r.text.DrawText("Level: " + level, 10, 70, 20, Color.BLACK);
     r.shapes.DrawRectangle(x, y, width, height, color);
 
     if (shieldActive) {
@@ -111,7 +100,7 @@ public class Player extends BaseEntity {
       ammo--;
       return new Projectile(x + width / 2, y, mouseX, mouseY);
     } else {
-      return new Projectile(0, 0, 0, 0);
+      return new Projectile(-1, -1, -1, -1);
     }
   }
 

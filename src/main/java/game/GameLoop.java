@@ -3,6 +3,7 @@ package game;
 import com.raylib.java.Raylib;
 import com.raylib.java.core.Color;
 import com.raylib.java.core.input.Keyboard;
+import game.entidades.AbstractEnemy;
 import game.entidades.Enemy;
 import game.entidades.Player;
 import game.entidades.Projectile;
@@ -13,17 +14,22 @@ import game.textures.Sky;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.time.Duration;
+import java.time.Instant;
 
 public class GameLoop {
   private Raylib r;
   private Random random;
 
   private Player player;
-  private List<Enemy> enemies;
+  private List<AbstractEnemy> enemies;
   private List<Projectile> projectiles;
   private List<Shield> shields;
 
   private Timer tiempo;
+  private int wave;
+  private boolean waveDisplay;
+  private Instant waveStartTime;
 
   public GameLoop() {
     r = new Raylib();
@@ -33,6 +39,9 @@ public class GameLoop {
     projectiles = new ArrayList<>();
     shields = new ArrayList<>();
     tiempo = new Timer(180);
+    wave = 1;
+    waveDisplay = true;
+    waveStartTime = Instant.now();
   }
 
   public void run() {
@@ -69,7 +78,7 @@ public class GameLoop {
       player.reload();
 
     // Enemy movement and collision
-    for (Enemy enemy : enemies) {
+    for (AbstractEnemy enemy : enemies) {
       // enemy movement randomization
       enemy.move(random.nextInt(0, 300), Config.WIDTH, Config.HEIGHT, player, enemies);
 
@@ -103,9 +112,19 @@ public class GameLoop {
     // Remove inactive projectiles
     projectiles.removeIf(projectile -> !projectile.isActive());
 
-    // Check if all enemies are dead
-    if (enemies.isEmpty()) {
-      enemies = spawnEnemies(5);
+    // Wave logic
+    if (waveDisplay) {
+      if (Duration.between(waveStartTime, Instant.now()).getSeconds() >= 2) {
+        waveDisplay = false;
+        enemies = spawnEnemies(wave * 2 + 3); // Increase enemies with each wave
+      }
+    } else {
+      // Check if all enemies are dead
+      if (enemies.isEmpty()) {
+        wave++;
+        waveDisplay = true;
+        waveStartTime = Instant.now();
+      }
     }
 
     // Shield pickup
@@ -132,7 +151,7 @@ public class GameLoop {
 
     player.draw(r);
 
-    for (Enemy enemy : enemies) {
+    for (AbstractEnemy enemy : enemies) {
       enemy.draw(r);
     }
 
@@ -146,16 +165,15 @@ public class GameLoop {
 
     r.text.DrawText("Tiempo restante: " + tiempo.getTime() + " seg", 1175, 15, 20, Color.WHITE);
 
-    // puntaje en pantalla
-    r.text.DrawText("Puntaje: " + player.getScore(), 10, 125, 22, Color.GOLD);
+    if (waveDisplay) {
+      r.text.DrawText("Wave " + wave, Config.WIDTH / 2 - 50, Config.HEIGHT / 2, 40, Color.RED);
+    }
 
-    // level en patalla
-    r.text.DrawText("Level: " + player.getLevel(), 10, 150, 22, Color.GREEN);
     r.core.EndDrawing();
   }
 
-  private List<Enemy> spawnEnemies(int numEnemies) {
-    List<Enemy> enemies = new ArrayList<>();
+  private List<AbstractEnemy> spawnEnemies(int numEnemies) {
+    List<AbstractEnemy> enemies = new ArrayList<>();
 
     for (int i = 0; i < numEnemies; i++) {
       int randomX = (random.nextInt(Config.WIDTH / Config.ENTITY_SIZE) * Config.ENTITY_SIZE);
