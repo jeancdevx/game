@@ -1,36 +1,44 @@
 package game;
 
-public class Timer {
-  private int contador;
-  private int Frames;
-  private boolean Timeup;
+import java.time.Duration;
+import java.time.Instant;
 
-  public Timer(int duracion) {
-    Frames = duracion * 60;
-    contador = 0;
-    Timeup = false;
+public class Timer {
+  private Instant startTime;
+  private Duration duration;
+  private boolean timeUp;
+
+  public Timer(int durationInSeconds) {
+    this.duration = Duration.ofSeconds(durationInSeconds);
+    this.timeUp = false;
+    start();
   }
 
-  public void Iniciar() {
-    contador = 0;
-    Timeup = false;
+  public void start() {
+    this.startTime = Instant.now();
+    this.timeUp = false;
   }
 
   public void update() {
-    if (!Timeup) {
-      contador++;
-
-      if (contador == Frames) {
-        Timeup = true;
+    if (!timeUp) {
+      Instant now = Instant.now();
+      if (Duration.between(startTime, now).compareTo(duration) >= 0) {
+        timeUp = true;
       }
     }
   }
 
-  public boolean Timeup() {
-    return Timeup;
+  public boolean isTimeUp() {
+    return timeUp;
   }
 
   public int getTime() {
-    return (Frames - contador) / 60;
+    if (timeUp) {
+      return 0;
+    } else {
+      Instant now = Instant.now();
+      Duration elapsed = Duration.between(startTime, now);
+      return (int) (duration.minus(elapsed).getSeconds());
+    }
   }
 }
