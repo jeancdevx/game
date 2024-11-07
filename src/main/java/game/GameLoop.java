@@ -75,22 +75,18 @@ public class GameLoop {
       return;
     }
 
-    // Timer hit zero - spawn boss if not already active
     if (tiempo.getTime() <= 0 && !bossActive) {
       spawnBoss();
     }
 
-    // Check for player death
     if (player.getHealth() <= 0 && !gameOver) {
       gameOver = true;
       gameOverStartTime = Instant.now();
       return;
     }
 
-    // Timer update
     tiempo.update();
 
-    // Player movement
     if (r.core.IsKeyPressed(Keyboard.KEY_D)) {
       player.move(0, Config.WIDTH, Config.HEIGHT, enemies, boss);
     } else if (r.core.IsKeyPressed(Keyboard.KEY_A)) {
@@ -106,37 +102,30 @@ public class GameLoop {
       projectiles.add(player.shoot(mouseX, mouseY));
     }
 
-    // Projectile reload
     if (r.core.IsKeyPressed(Keyboard.KEY_R))
       player.reload();
 
-    // Enemy movement and shooting
     for (AbstractEnemy enemy : enemies) {
-      // enemy movement randomization
       enemy.move(random.nextInt(400), Config.WIDTH, Config.HEIGHT, player, enemies);
 
-      // enemy shooting
-      EnemyProjectile enemyProjectile = ((Enemy) enemy).shoot(player, wave + 2); // Increase speed with wave
+      EnemyProjectile enemyProjectile = ((Enemy) enemy).shoot(player, wave + 2);
       if (enemyProjectile != null) {
         enemyProjectiles.add(enemyProjectile);
       }
 
-      // enemy collision with projectiles
       for (Projectile projectile : projectiles) {
         if (projectile.collidesWith(enemy)) {
           enemy.damage();
           projectile.setActive(false);
 
-          // puntaje de los enemigos al ser matados
           if (enemy.getHealth() <= 0) {
             player.increaseScore();
             player.increaseLevel();
 
-            // Random chance to drop heart (10%) or shield (20%)
             int drop = random.nextInt(100);
             if (drop < 10) {
               hearts.add(new Heart(enemy.getX(), enemy.getY()));
-            } else if (drop < 30) { // 20% chance for shield
+            } else if (drop < 30) {
               shields.add(new Shield(enemy.getX(), enemy.getY()));
             }
           }
@@ -144,23 +133,18 @@ public class GameLoop {
       }
     }
 
-    // Add boss update logic after enemy updates
     if (bossActive && boss != null) {
-      // Boss movement
       boss.move(random.nextInt(500), Config.WIDTH, Config.HEIGHT, player, enemies);
 
-      // Boss shooting
       EnemyProjectile bossProjectile = boss.shoot(player);
       if (bossProjectile != null) {
         enemyProjectiles.add(bossProjectile);
       }
 
-      // Boss spawning minions
       if (boss.canSpawnEnemy() && enemies.size() < 5) {
         enemies.add(boss.spawnEnemy());
       }
 
-      // Check projectile collisions with boss
       for (Projectile projectile : projectiles) {
         if (projectile.collidesWith(boss)) {
           boss.damage();
@@ -173,34 +157,28 @@ public class GameLoop {
       }
     }
 
-    // Projectile movement
     for (Projectile projectile : projectiles) {
       projectile.move();
     }
 
-    // Enemy projectile movement
     for (EnemyProjectile enemyProjectile : enemyProjectiles) {
       enemyProjectile.move();
       if (enemyProjectile.collidesWith(player)) {
-        player.damage(); // This now handles shield logic internally
+        player.damage();
         enemyProjectile.setActive(false);
       }
     }
 
-    // Remove dead entities
     enemies.removeIf(enemy -> enemy.getHealth() <= 0);
-    // Remove inactive projectiles
     projectiles.removeIf(projectile -> !projectile.isActive());
     enemyProjectiles.removeIf(enemyProjectile -> !enemyProjectile.isActive());
 
-    // Wave logic
     if (waveDisplay) {
       if (Duration.between(waveStartTime, Instant.now()).getSeconds() >= 2) {
         waveDisplay = false;
-        enemies = spawnEnemies(wave * 2 + 3); // Increase enemies with each wave
+        enemies = spawnEnemies(wave * 2 + 3);
       }
     } else {
-      // Check if all enemies are dead
       if (enemies.isEmpty()) {
         wave++;
         waveDisplay = true;
@@ -208,7 +186,6 @@ public class GameLoop {
       }
     }
 
-    // Shield pickup
     for (Shield shield : shields) {
       if (shield.collidesWith(player)) {
         player.activateShield();
@@ -216,7 +193,6 @@ public class GameLoop {
       }
     }
 
-    // Heart pickup
     for (Heart heart : hearts) {
       if (heart.collidesWith(player)) {
         player.collectHeart();
@@ -224,18 +200,15 @@ public class GameLoop {
       }
     }
 
-    // Remove inactive shields
     shields.removeIf(shield -> !shield.isActive());
 
-    // Remove inactive hearts
     hearts.removeIf(heart -> !heart.isActive());
 
-    // Update player shield status
     player.updateShield();
   }
 
   private void spawnBoss() {
-    enemies.clear(); // Clear existing enemies
+    enemies.clear();
     boss = new Boss(Config.WIDTH / 2 - 40, 100);
     bossActive = true;
   }
@@ -243,9 +216,9 @@ public class GameLoop {
   private void bossDefeated() {
     bossActive = false;
     boss = null;
-    player.increaseScore(); // Add extra score for defeating boss
-    tiempo = new Timer(60); // Reset timer
-    wave++; // Increment wave
+    player.increaseScore();
+    tiempo = new Timer(60);
+    wave++;
     waveDisplay = true;
     waveStartTime = Instant.now();
   }
@@ -279,7 +252,6 @@ public class GameLoop {
       heart.draw(r);
     }
 
-    // Draw boss if active
     if (bossActive && boss != null) {
       boss.draw(r);
     }

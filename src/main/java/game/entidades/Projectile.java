@@ -34,7 +34,6 @@ public class Projectile {
     x += (int) (directionX * speed);
     y += (int) (directionY * speed);
 
-    // Deactivate if out of bounds
     if (x < 0 || x > 1440 || y < 0 || y > 960) {
       active = false;
     }
