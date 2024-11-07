@@ -5,6 +5,7 @@ import com.raylib.java.core.Color;
 import com.raylib.java.core.input.Keyboard;
 import game.entidades.AbstractEnemy;
 import game.entidades.Enemy;
+import game.entidades.EnemyProjectile;
 import game.entidades.Player;
 import game.entidades.Projectile;
 import game.entidades.Shield;
@@ -24,6 +25,7 @@ public class GameLoop {
   private Player player;
   private List<AbstractEnemy> enemies;
   private List<Projectile> projectiles;
+  private List<EnemyProjectile> enemyProjectiles;
   private List<Shield> shields;
 
   private Timer tiempo;
@@ -35,10 +37,11 @@ public class GameLoop {
     r = new Raylib();
     player = new Player();
     random = new Random();
-    enemies = spawnEnemies(5);
+    enemies = new ArrayList<>();
     projectiles = new ArrayList<>();
+    enemyProjectiles = new ArrayList<>();
     shields = new ArrayList<>();
-    tiempo = new Timer(180);
+    tiempo = new Timer(60);
     wave = 1;
     waveDisplay = true;
     waveStartTime = Instant.now();
@@ -77,10 +80,16 @@ public class GameLoop {
     if (r.core.IsKeyPressed(Keyboard.KEY_R))
       player.reload();
 
-    // Enemy movement and collision
+    // Enemy movement and shooting
     for (AbstractEnemy enemy : enemies) {
       // enemy movement randomization
-      enemy.move(random.nextInt(0, 300), Config.WIDTH, Config.HEIGHT, player, enemies);
+      enemy.move(random.nextInt(400), Config.WIDTH, Config.HEIGHT, player, enemies);
+
+      // enemy shooting
+      EnemyProjectile enemyProjectile = ((Enemy) enemy).shoot(player, wave + 2); // Increase speed with wave
+      if (enemyProjectile != null) {
+        enemyProjectiles.add(enemyProjectile);
+      }
 
       // enemy collision with projectiles
       for (Projectile projectile : projectiles) {
@@ -107,10 +116,20 @@ public class GameLoop {
       projectile.move();
     }
 
+    // Enemy projectile movement
+    for (EnemyProjectile enemyProjectile : enemyProjectiles) {
+      enemyProjectile.move();
+      if (enemyProjectile.collidesWith(player)) {
+        player.damage();
+        enemyProjectile.setActive(false);
+      }
+    }
+
     // Remove dead entities
     enemies.removeIf(enemy -> enemy.getHealth() <= 0);
     // Remove inactive projectiles
     projectiles.removeIf(projectile -> !projectile.isActive());
+    enemyProjectiles.removeIf(enemyProjectile -> !enemyProjectile.isActive());
 
     // Wave logic
     if (waveDisplay) {
@@ -157,6 +176,10 @@ public class GameLoop {
 
     for (Projectile projectile : projectiles) {
       projectile.draw(r);
+    }
+
+    for (EnemyProjectile enemyProjectile : enemyProjectiles) {
+      enemyProjectile.draw(r);
     }
 
     for (Shield shield : shields) {
