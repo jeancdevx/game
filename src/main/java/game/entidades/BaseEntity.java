@@ -2,6 +2,7 @@ package game.entidades;
 
 import com.raylib.java.Raylib;
 import com.raylib.java.core.Color;
+import java.util.List;
 
 public abstract class BaseEntity {
   protected int x;
@@ -32,6 +33,21 @@ public abstract class BaseEntity {
 
   public void damage() {
     health--;
+  }
+
+  protected boolean canMove(int newX, int newY, int screenWidth, int screenHeight,
+      List<? extends BaseEntity> entities) {
+    if (newX < 0 || newX >= screenWidth || newY < 0 || newY >= screenHeight) {
+      return false;
+    }
+
+    for (BaseEntity entity : entities) {
+      if (entity != this && newX == entity.getX() && newY == entity.getY()) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   public int getX() {
