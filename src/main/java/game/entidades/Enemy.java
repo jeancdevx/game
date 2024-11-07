@@ -41,7 +41,7 @@ public class Enemy extends AbstractEnemy {
   }
 
   public EnemyProjectile shoot(Player player, int speed) {
-    if (random.nextInt(50000) < 10) { // 10% chance to shoot
+    if (random.nextInt(25000) < 10) { // 10% chance to shoot
       return new EnemyProjectile(x + width / 2, y + height / 2, player.getX(), player.getY(), speed);
     }
     return null;

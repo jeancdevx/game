@@ -9,6 +9,7 @@ import com.raylib.java.core.Color;
 import game.Config;
 
 public class Player extends BaseEntity {
+  private static final int MAX_HEALTH = 5;
   private int score;
   private int level;
   private int ammo;
@@ -24,7 +25,7 @@ public class Player extends BaseEntity {
         Config.ENTITY_SIZE,
         Config.ENTITY_SIZE,
         Color.RED,
-        Config.PLAYER_HEALTH);
+        MAX_HEALTH); // Start with max health
     score = 0;
     level = 0;
     maxAmmo = 20;
@@ -73,9 +74,27 @@ public class Player extends BaseEntity {
   }
 
   public void activateShield() {
-    shieldActive = true;
-    shieldStartTime = Instant.now();
-    health++;
+    if (!shieldActive && health < MAX_HEALTH + 1) {
+      shieldActive = true;
+      shieldStartTime = Instant.now();
+      health = Math.min(health + 1, MAX_HEALTH + 1);
+    }
+  }
+
+  public void removeShield() {
+    if (shieldActive) {
+      shieldActive = false;
+      health = Math.min(health - 1, MAX_HEALTH);
+    }
+  }
+
+  @Override
+  public void damage() {
+    if (shieldActive) {
+      removeShield();
+    } else {
+      health = Math.max(0, health - 1);
+    }
   }
 
   public void updateShield() {

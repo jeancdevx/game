@@ -22,17 +22,19 @@ public class Projectile {
     this.height = 10;
     this.active = true;
 
-    int deltaX = targetX - startX;
-    int deltaY = targetY - startY;
+    double deltaX = targetX - startX;
+    double deltaY = targetY - startY;
     double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
     this.directionX = deltaX / distance;
     this.directionY = deltaY / distance;
   }
 
   public void move() {
-    x += (int) (speed * directionX);
-    y += (int) (speed * directionY);
+    x += (int) (directionX * speed);
+    y += (int) (directionY * speed);
 
+    // Deactivate if out of bounds
     if (x < 0 || x > 1440 || y < 0 || y > 960) {
       active = false;
     }

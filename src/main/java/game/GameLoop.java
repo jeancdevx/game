@@ -137,7 +137,7 @@ public class GameLoop {
     for (EnemyProjectile enemyProjectile : enemyProjectiles) {
       enemyProjectile.move();
       if (enemyProjectile.collidesWith(player)) {
-        player.damage();
+        player.damage(); // This now handles shield logic internally
         enemyProjectile.setActive(false);
       }
     }
