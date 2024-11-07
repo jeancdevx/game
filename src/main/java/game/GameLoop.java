@@ -6,6 +6,7 @@ import com.raylib.java.core.input.Keyboard;
 import game.entidades.AbstractEnemy;
 import game.entidades.Enemy;
 import game.entidades.EnemyProjectile;
+import game.entidades.Heart;
 import game.entidades.Player;
 import game.entidades.Projectile;
 import game.entidades.Shield;
@@ -27,6 +28,7 @@ public class GameLoop {
   private List<Projectile> projectiles;
   private List<EnemyProjectile> enemyProjectiles;
   private List<Shield> shields;
+  private List<Heart> hearts;
 
   private Timer tiempo;
   private int wave;
@@ -43,6 +45,7 @@ public class GameLoop {
     projectiles = new ArrayList<>();
     enemyProjectiles = new ArrayList<>();
     shields = new ArrayList<>();
+    hearts = new ArrayList<>();
     tiempo = new Timer(60);
     wave = 1;
     waveDisplay = true;
@@ -119,8 +122,11 @@ public class GameLoop {
             player.increaseScore();
             player.increaseLevel();
 
-            // Randomly drop a shield
-            if (random.nextInt(100) < 20) { // 20% chance to drop a shield
+            // Random chance to drop heart (10%) or shield (20%)
+            int drop = random.nextInt(100);
+            if (drop < 10) {
+              hearts.add(new Heart(enemy.getX(), enemy.getY()));
+            } else if (drop < 30) { // 20% chance for shield
               shields.add(new Shield(enemy.getX(), enemy.getY()));
             }
           }
@@ -171,8 +177,19 @@ public class GameLoop {
       }
     }
 
+    // Heart pickup
+    for (Heart heart : hearts) {
+      if (heart.collidesWith(player)) {
+        player.collectHeart();
+        heart.setActive(false);
+      }
+    }
+
     // Remove inactive shields
     shields.removeIf(shield -> !shield.isActive());
+
+    // Remove inactive hearts
+    hearts.removeIf(heart -> !heart.isActive());
 
     // Update player shield status
     player.updateShield();
@@ -203,6 +220,10 @@ public class GameLoop {
       shield.draw(r);
     }
 
+    for (Heart heart : hearts) {
+      heart.draw(r);
+    }
+
     r.text.DrawText("Tiempo restante: " + tiempo.getTime() + " seg", 1175, 15, 20, Color.WHITE);
 
     if (waveDisplay) {
@@ -224,6 +245,7 @@ public class GameLoop {
     projectiles.clear();
     enemyProjectiles.clear();
     shields.clear();
+    hearts.clear();
     tiempo = new Timer(60);
     wave = 1;
     waveDisplay = true;
